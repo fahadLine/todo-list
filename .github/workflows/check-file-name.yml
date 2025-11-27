@@ -1,0 +1,25 @@
+name: Check File Names
+
+on: 
+  pull_request:
+
+jobs:
+  check-file-names:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Check for file name length
+      run: |
+        echo "Checking file names for length..."
+        files_exceeding_limit=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | awk 'length($0) > 20')
+
+        if [ ! -z "$files_exceeding_limit" ]; then
+          echo "Error: The following files exceed 20 characters in their names:"
+          echo "$files_exceeding_limit"
+          exit 1
+        else
+          echo "All file names are within the limit."
+        fi
